@@ -1,10 +1,10 @@
 import HealthStatus from './components/HealthStatus.jsx'
+import StudentsPage from './pages/StudentsPage.jsx'
 
 export default function App() {
   return (
     <main>
-      <h1>StudyMatch</h1>
-      <HealthStatus />
+      <StudentsPage />
     </main>
   )
 }

@@ -64,7 +64,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<!-- Exposes the Mockito jar path so it can be loaded as a Java agent during tests -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -76,7 +75,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Test coverage report: target/site/jacoco/index.html -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
