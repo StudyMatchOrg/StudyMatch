@@ -1,12 +1,5 @@
 # StudyMatch Domain Model
 
-This model represents the concepts of the StudyMatch problem, as found in the
-[use cases](../use-cases.md). It describes the domain, not the implementation:
-controllers, repositories and database tables are not shown. Code names follow the
-term table in [conventions.md](../conventions.md).
-
-It replaces the first sketch (`initial-domain-model-concept-diagram.png`), which did not
-yet include academic history, competencies, profiles, cold start or group sets.
 
 ## Class diagram
 
