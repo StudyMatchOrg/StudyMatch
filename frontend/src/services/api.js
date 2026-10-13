@@ -15,3 +15,14 @@ async function request(path, options = {}) {
 export function getHealth() {
   return request('/api/health')
 }
+
+export function getStudents() {
+  return request('/api/students')
+}
+
+export function createStudent(student) {
+  return request('/api/students', {
+    method: 'POST',
+    body: JSON.stringify(student),
+  })
+}
