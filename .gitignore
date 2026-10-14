@@ -23,5 +23,11 @@
 hs_err_pid*
 replay_pid*
 
-# env files (can opt-in for committing if needed)
-.env*
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+
+# Local environment and tooling
+.env
+.claude/
