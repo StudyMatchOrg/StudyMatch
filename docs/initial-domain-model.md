@@ -1,5 +1,11 @@
 # StudyMatch Domain Model
 
+This model represents the concepts of the StudyMatch problem, as found in the
+[use cases](use-cases.md) (UC1–UC16). It describes the domain, not the implementation:
+controllers, repositories and database tables are not shown. It was updated in Sprint 2 with
+the evidence-based profile; the profile rule itself is explained in
+[sprint-2-design.md](sprint-2-design.md).
+
 
 ## Class diagram
 
@@ -43,7 +49,7 @@ classDiagram
         description
     }
     class CourseUnitCompetency {
-        weight: 0..1
+        weight: greater than 0, at most 1
     }
     class AcademicRecord {
         academicYear
@@ -69,7 +75,22 @@ classDiagram
         <<derived>>
         score: 0..1, optional
         confidence: 0..1
-        evidenceCount
+        status: ProfileStatus
+        totalWeight
+    }
+    class Evidence {
+        <<derived>>
+        type: EvidenceType
+        value: 0..1
+        weight
+        share
+    }
+    class ProfileStatus {
+        <<enumeration>>
+        UNKNOWN
+        INITIAL_ONLY
+        ACADEMIC
+        BLENDED
     }
     class GroupingContext {
         academicYear
@@ -95,6 +116,9 @@ classDiagram
     Student "1" -- "1" StudentProfile : summarised by
     StudentProfile "1" *-- "*" CompetencyScore
     CompetencyScore "*" --> "1" Competency
+    CompetencyScore "1" *-- "*" Evidence : explained by
+    Evidence "*" ..> "0..1" AcademicRecord : from
+    Evidence "*" ..> "0..1" CompetencyAssessment : from
     Teacher "1" -- "*" GroupingContext : defines
     GroupingContext "*" --> "1" CourseUnit : for
     GroupingContext "1" -- "*" GroupSet : produces
@@ -108,20 +132,21 @@ classDiagram
 |---|---|---|---|
 | **UserAccount** | Credenciais, Tipo de Conta | UC1, UC2 | Credentials used to log in. Its `AccountType` defines which features the user can access. Only Admins and Teachers have accounts; students are managed by them and do not log in. |
 | **Teacher** | Professor | UC7, UC8, UC10–UC14 | Academic staff member who registers academic results, assesses new students, defines grouping contexts and forms groups. |
-| **Student** | Estudante | UC9, UC10, UC12, UC13 | A student of a degree, identified by a unique student number. Managed by the Admin (UC9). |
+| **Student** | Estudante | UC9, UC10, UC12, UC13, UC16 | A student of a degree, identified by a unique student number. Managed by the Admin (UC9). |
 | **Degree** | Curso | UC3, UC4, UC9 | A degree programme (e.g. "Engenharia Informática"). |
 | **CourseUnit** | Cadeira | UC5, UC6, UC10, UC11 | A course unit of one or more degrees, with its ECTS credits and position in the curriculum. |
 | **Competency** | Competência | UC11, UC12 | Something a student can be good at (e.g. Programming, Databases, Problem Solving). Competencies are data, not hard-coded, so new ones can be added (UC11). |
-| **CourseUnitCompetency** | Peso da Competência | UC11 | How much a course unit develops a competency (`weight` from 0 to 1). This is how grades are turned into competencies. |
+| **CourseUnitCompetency** | Peso da Competência | UC11 | How much a course unit develops a competency (`weight` greater than 0 and at most 1). This is how grades are turned into competencies. A course unit that does not develop a competency has no link to it. |
 | **AcademicRecord** | Registo Académico | UC10, UC15 | One attempt of a student at a course unit in a given academic year and semester. A student can have several records for the same course unit (failed and repeated, or grade improvement). The grade is empty while the student is still enrolled. Records can be entered one by one (UC10) or imported (UC15). |
-| **CompetencyAssessment** | Avaliação Inicial | UC13 | A teacher's estimate of a student's level in a competency, for students with little or no academic history (cold start). |
-| **StudentProfile** *(derived)* | Perfil do Estudante | UC12, search | The current summary of a student: one `CompetencyScore` per competency. It is calculated from academic records and assessments, never entered by hand, so it is always up to date. |
-| **CompetencyScore** *(derived)* | Pontuação de Competência | UC12, search | The student's level in one competency (0 to 1), how much evidence supports it (`evidenceCount`) and how reliable it is (`confidence`). With no evidence at all, the score is unknown rather than 0. A low confidence is what "perfil com pouca evidência" means in the search filters. |
+| **CompetencyAssessment** | Avaliação Inicial | UC13 | A teacher's estimate (0 to 1) of a student's level in a competency, for students with little or no academic history (cold start). A student has at most one current assessment per competency. |
+| **StudentProfile** *(derived)* | Perfil do Estudante | UC12, UC16 | The current summary of a student: one `CompetencyScore` per competency. It is calculated from academic records and assessments, never entered by hand, so it is always up to date. |
+| **CompetencyScore** *(derived)* | Pontuação de Competência | UC12, UC16 | The student's level in one competency (0 to 1), how much evidence supports it (`totalWeight`), how reliable it is (`confidence`) and which kinds of evidence it uses (`status`). With no evidence at all, the score is unknown rather than 0. A low confidence is what "perfil com pouca evidência" means in the search filters. |
+| **Evidence** *(derived)* | Evidência | UC12, UC13 | One piece of information about a competency: the best grade of a course unit, or a teacher assessment. It has a value (0 to 1), a weight and its share of the score, which is how the profile explains each number. |
 | **GroupingContext** | Contexto de Agrupamento | UC8, UC14 | The situation in which groups are formed: a course unit, an academic year and a target group size. |
 | **GroupSet** | Conjunto de Grupos | UC7, UC8 | One result of forming groups for a grouping context. It can be exported (UC7). |
 | **Group** | Grupo | UC7, UC8 | A numbered group of students within a group set. |
 
-The search use case ("Pesquisar e Filtrar Estudantes") introduces no new concepts: it
+The search use case (UC16, "Pesquisar e Filtrar Estudantes") introduces no new concepts: it
 filters existing ones. "Cadeira em que está inscrito" means an `AcademicRecord` with
 status `ENROLLED`, and "nível mínimo numa competência" uses `CompetencyScore`.
 
@@ -131,17 +156,19 @@ status `ENROLLED`, and "nível mínimo numa competência" uses `CompetencyScore`
 2. A degree code and name are unique (UC3). A course unit code is unique, and a course
    unit belongs to at least one degree (UC5).
 3. A student belongs to exactly one existing degree (UC9).
-4. A course-unit competency weight is between 0 and 1. A course unit cannot be linked
-   to the same competency twice (UC11).
+4. A course-unit competency weight is greater than 0 and at most 1. A course unit cannot be
+   linked to the same competency twice (UC11).
 5. A grade is between 0 and 20. A record with status `PASSED` has a grade of at least 10;
    a record with status `FAILED` has a grade below 10; a record with status `ENROLLED`
    has no grade (UC10).
 6. A record's course unit must belong to the student's degree, and a student cannot have
    two records for the same course unit in the same academic year and semester (UC10).
-7. An assessment value is between 0 and 1, and is always made by a teacher (UC13).
-8. A competency score is calculated only from evidence linked to that competency. The
-   more academic evidence exists, the less the initial assessments count. Changing a
-   course-unit weight changes the calculated profiles (UC11).
+7. An assessment value is between 0 and 1, it is made by a teacher, and a student has at most
+   one assessment per competency (UC13).
+8. A competency score is calculated only from evidence linked to that competency: the best
+   grade of each linked course unit and the teacher assessment. The more academic evidence
+   exists, the less the initial assessment counts. Changing a course-unit weight changes the
+   calculated profiles (UC11, UC12).
 9. A group size is at least 2 and at most the number of students in the grouping
    context (UC8).
 10. Only students enrolled in the context's course unit can be placed in its groups, and
