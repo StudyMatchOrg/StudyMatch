@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getHealth } from '../services/api.js'
+import { getHealth } from '../services/healthApi.js'
 
 export default function HealthStatus() {
   const [health, setHealth] = useState(null)

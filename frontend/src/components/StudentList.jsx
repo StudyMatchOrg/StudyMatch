@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function StudentList({ students }) {
   if (students.length === 0) {
     return <p className="muted">No students registered yet.</p>
@@ -15,7 +17,9 @@ export default function StudentList({ students }) {
         {students.map((student) => (
           <tr key={student.id}>
             <td>{student.studentNumber}</td>
-            <td>{student.name}</td>
+            <td>
+              <Link to={`/students/${student.id}`}>{student.name}</Link>
+            </td>
             <td>{student.email}</td>
           </tr>
         ))}
