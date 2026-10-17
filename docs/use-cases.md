@@ -129,8 +129,10 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | **Ator** | Professor |
 | **Descrição** | 1. O caso de uso inicia quando o professor seleciona a opção *Formar Grupos*.<br>2. O sistema apresenta os contextos de agrupamento do professor (UC14).<br>3. O professor seleciona o contexto.<br>4. O sistema lê os perfis dos estudantes inscritos na cadeira do contexto.<br>5. O Sistema forma os grupos.<br>6. O Sistema apresenta os grupos.<br>7. O Sistema guarda os grupos como um conjunto. |
 | **Cenário Alternativo** | **1. Não existem alunos inscritos na cadeira:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso.<br>**2. As informações são inválidas:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso. |
-| **Regras de Negócio / Restrições** | • Só o Professor pode formar grupos.<br>• O tamanho do grupo tem de ser $\ge 2$ e $\le$ nº de alunos.<br>• Cada aluno fica em exatamente um grupo por conjunto.<br>• Só entram alunos inscritos na cadeira do contexto.<br>• O critério de formação usará os perfis dos estudantes (UC12) e será definido num sprint futuro.<br>• Os grupos ficam guardados como um conjunto. |
+| **Regras de Negócio / Restrições** | • Só o Professor pode formar grupos.<br>• O tamanho do grupo tem de ser $\ge 2$ e $\le$ nº de alunos.<br>• Cada aluno fica em exatamente um grupo por conjunto.<br>• Só entram alunos inscritos na cadeira do contexto.<br>• Os grupos ficam guardados como um conjunto. |
 | **Conceitos do Domínio** | Contexto de Agrupamento, Grupo, Conjunto de Grupos, Perfil do Estudante |
+
+> **Nota:** O critério de formação usará os perfis dos estudantes (UC12) e será definido num sprint futuro.
 
 ---
 
@@ -166,8 +168,10 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | **Ator** | Professor |
 | **Descrição** | 1. O caso de uso inicia quando o Professor seleciona a opção *Competências*.<br>2. O Sistema apresenta as competências existentes (ex.: Programação, Bases de Dados, Resolução de Problemas).<br>3. O Professor cria uma competência ou seleciona uma cadeira.<br>4. Para a cadeira, o Professor associa competências e indica o peso de cada uma (maior que 0 e no máximo 1).<br>5. O Sistema guarda as associações. |
 | **Cenário Alternativo** | **1. O peso está fora do intervalo:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso.<br>**2. A competência já está associada à cadeira:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso. |
-| **Regras de Negócio / Restrições** | • As competências são configuráveis, não fixas no código.<br>• Uma cadeira pode desenvolver várias competências, e uma competência pode vir de várias cadeiras.<br>• Alterar os pesos atualiza os perfis calculados.<br>• No Sprint 2 as competências e os pesos são carregados como dados e consultados no ecrã *Competencies*; a edição fica para um sprint futuro. |
+| **Regras de Negócio / Restrições** | • As competências são configuráveis, não fixas no código.<br>• Uma cadeira pode desenvolver várias competências, e uma competência pode vir de várias cadeiras.<br>• Alterar os pesos atualiza os perfis calculados. |
 | **Conceitos do Domínio** | Competência, Cadeira, Peso da Competência |
+
+> **Nota:** No Sprint 2 as competências e os pesos são carregados como dados e consultados no ecrã *Competencies*; a edição fica para um sprint futuro.
 
 ---
 
@@ -178,8 +182,10 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | **Ator** | Professor |
 | **Descrição** | 1. O caso de uso inicia quando o Professor seleciona um estudante.<br>2. O Sistema calcula o perfil a partir dos registos académicos e das avaliações iniciais.<br>3. O Sistema apresenta, para cada competência, a pontuação (0 a 1), a confiança e a origem da evidência (notas, estimativa do professor ou ambas).<br>4. O Professor seleciona uma competência.<br>5. O Sistema mostra cada evidência que contribuiu para a pontuação, com o seu peso e a sua percentagem. |
 | **Cenário Alternativo** | **Não existe nenhuma evidência para uma competência:**<br>1. O sistema mostra essa competência como "desconhecida", e não como 0. |
-| **Regras de Negócio / Restrições** | • O perfil é calculado sempre que é pedido, nunca introduzido à mão, por isso está sempre atualizado.<br>• De cada cadeira conta apenas a melhor nota.<br>• A fórmula está documentada em [sprint-2-design.md](sprint-2-design.md). |
+| **Regras de Negócio / Restrições** | • De cada cadeira conta apenas a melhor nota. |
 | **Conceitos do Domínio** | Perfil do Estudante, Pontuação de Competência, Evidência, Registo Académico, Avaliação Inicial |
+
+> **Nota:** O perfil é calculado sempre que é pedido, nunca introduzido à mão, por isso está sempre atualizado. A fórmula está documentada em [sprint-2-design.md](sprint-2-design.md).
 
 ---
 
@@ -204,8 +210,10 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | **Ator** | Professor |
 | **Descrição** | 1. O caso de uso inicia quando o Professor seleciona *Novo Contexto de Agrupamento*.<br>2. O Sistema pede a cadeira, o ano letivo e o tamanho dos grupos.<br>3. O Professor insere os dados.<br>4. O Sistema mostra quantos estudantes estão inscritos e quantos grupos resultam.<br>5. O Professor confirma e o Sistema guarda o contexto. |
 | **Cenário Alternativo** | **O tamanho do grupo é inválido para o número de inscritos:**<br>1. O sistema apresenta um aviso. |
-| **Regras de Negócio / Restrições** | • O tamanho do grupo tem de ser ≥ 2 e ≤ nº de inscritos.<br>• Um contexto pertence a uma cadeira e a um ano letivo.<br>• Um contexto pode originar vários conjuntos de grupos (UC8).<br>• A formação automática de grupos está fora do âmbito do Sprint 2. |
+| **Regras de Negócio / Restrições** | • O tamanho do grupo tem de ser ≥ 2 e ≤ nº de inscritos.<br>• Um contexto pertence a uma cadeira e a um ano letivo.<br>• Um contexto pode originar vários conjuntos de grupos (UC8). |
 | **Conceitos do Domínio** | Contexto de Agrupamento, Cadeira |
+
+> **Nota:** A formação automática de grupos está fora do âmbito do Sprint 2.
 
 ---
 
