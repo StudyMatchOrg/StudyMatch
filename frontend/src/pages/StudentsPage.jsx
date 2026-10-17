@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import HealthStatus from '../components/HealthStatus.jsx'
 import StudentForm from '../components/StudentForm.jsx'
 import StudentList from '../components/StudentList.jsx'
-import { createStudent, getStudents } from '../services/api.js'
+import { createStudent, getStudents } from '../services/studentsApi.js'
 
 export default function StudentsPage() {
   const [students, setStudents] = useState([])
@@ -24,9 +23,8 @@ export default function StudentsPage() {
   }
 
   return (
-    <main>
-      <h1>StudyMatch</h1>
-      <HealthStatus />
+    <>
+      <h1>Students</h1>
 
       <section>
         <h2>Add student</h2>
@@ -34,9 +32,9 @@ export default function StudentsPage() {
       </section>
 
       <section>
-        <h2>Students</h2>
+        <h2>All students</h2>
         {error ? <p className="error">{error}</p> : <StudentList students={students} />}
       </section>
-    </main>
+    </>
   )
 }
