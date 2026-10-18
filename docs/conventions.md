@@ -22,6 +22,7 @@
 | Competência | `Competency` |
 | Avaliação Inicial | `CompetencyAssessment` |
 | Perfil do Estudante | `StudentProfile` |
+| Evidência | `Evidence` |
 | Contexto de Agrupamento | `GroupingContext` |
 | Grupo | `Group` |
 | Conjunto de Grupos | `GroupSet` |
