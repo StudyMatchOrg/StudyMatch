@@ -1,4 +1,4 @@
-package pt.upt.studymatch.domain.profile;
+package pt.upt.studymatch.domain;
 
 /**
  * Which kinds of evidence a competency score is based on.

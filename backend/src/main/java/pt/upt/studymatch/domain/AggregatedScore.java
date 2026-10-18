@@ -1,4 +1,4 @@
-package pt.upt.studymatch.domain.profile;
+package pt.upt.studymatch.domain;
 
 import java.util.List;
 

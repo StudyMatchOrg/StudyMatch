@@ -1,4 +1,4 @@
-package pt.upt.studymatch.domain.profile;
+package pt.upt.studymatch.domain;
 
 /**
  * Where a piece of evidence about a competency comes from.

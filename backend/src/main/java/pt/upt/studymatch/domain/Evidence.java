@@ -1,4 +1,4 @@
-package pt.upt.studymatch.domain.profile;
+package pt.upt.studymatch.domain;
 
 /**
  * One piece of evidence about a student's level in a competency.
