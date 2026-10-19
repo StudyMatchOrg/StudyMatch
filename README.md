@@ -32,7 +32,8 @@ StudyMatch/
 | [Technology stack](docs/technology-stack.md) | Chosen technologies and why. |
 | [Architecture](docs/architecture/architecture.md) | Components, layers, communication, persistence and main decisions. |
 | [Use cases](docs/use-cases.md) | Actors and use-case model, including the team's own proposals. |
-| [Domain model](docs/initial-domain-model/domain-model.md) | Domain concepts, relationships and constraints. |
+| [Domain model](docs/initial-domain-model.md) | Domain concepts, relationships and constraints. |
+| [Sprint 2 design](docs/sprint-2-design.md) | Student profile rule, cold-start strategy, CSV import and their justification. |
 | [Conventions and workflow](docs/conventions.md) | Coding conventions, Git workflow, Pull Request rules and Definition of Done. |
 
 ## Prerequisites
@@ -57,9 +58,20 @@ CREATE USER 'studymatch'@'localhost' IDENTIFIED BY 'studymatch';
 GRANT ALL PRIVILEGES ON studymatch.* TO 'studymatch'@'localhost';
 ```
 
-These are local development defaults. To use different settings, set the environment
-variables `DB_URL`, `DB_USERNAME` and `DB_PASSWORD` before starting the backend.
-The tables are created automatically when the backend starts.
+Then create the file `backend/.env` with the credentials (it is ignored by Git, so your
+password is never committed):
+
+```properties
+DB_USER=studymatch
+DB_PASSWORD=studymatch
+```
+
+The same values can be given as environment variables instead. `DB_URL` can also be set
+if MySQL does not run on `localhost:3306`. The tables are created automatically when the
+backend starts.
+
+> **Upgrading from Sprint 1?** The tables changed (a student now has a degree), so
+> recreate the database once: `DROP DATABASE studymatch; CREATE DATABASE studymatch;`
 
 ### 2. Run the backend
 
@@ -82,6 +94,20 @@ npm run dev
 
 Open <http://localhost:5173>. The development server forwards `/api` requests to the
 backend, so the backend must be running.
+
+## Using the application
+
+| Page | What you can do |
+|---|---|
+| **Students** | List and add students; open a student. |
+| **Student page** | Edit the student, manage the academic history, give an initial assessment (cold start) and see the competency profile. Click a competency to see the evidence behind its score. |
+| **Competencies** | See the competencies and how much each course unit develops them. |
+| **Import** | Import academic history from a CSV file. A sample file is available on the page. |
+
+On startup the backend adds **demo data** if it is missing: degrees, course units,
+competencies and four students (Diogo and Ana with grades, Bruno with only a teacher
+assessment, Carla with nothing). Changes made in the application are kept. To start with
+an empty database, set `DEMO_DATA=false`.
 
 ## Build and test
 
