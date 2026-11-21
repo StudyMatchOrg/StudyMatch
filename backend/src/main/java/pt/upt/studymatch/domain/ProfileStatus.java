@@ -11,5 +11,10 @@ public enum ProfileStatus {
     /** Only academic results. */
     ACADEMIC,
     /** Academic results combined with cold-start evidence. */
-    BLENDED
+    BLENDED;
+
+    /** True when the score is based on at least one grade. */
+    public boolean hasAcademicEvidence() {
+        return this == ACADEMIC || this == BLENDED;
+    }
 }
