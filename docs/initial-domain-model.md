@@ -3,8 +3,9 @@
 This model represents the concepts of the StudyMatch problem, as found in the
 [use cases](use-cases.md) (UC1–UC16). It describes the domain, not the implementation:
 controllers, repositories and database tables are not shown. It was updated in Sprint 2 with
-the evidence-based profile; the profile rule itself is explained in
-[sprint-2-design.md](sprint-2-design.md).
+the evidence-based profile, explained in [sprint-2-design.md](sprint-2-design.md), and in
+Sprint 3 with accounts, projects and generated groups, explained in
+[sprint-3-design.md](sprint-3-design.md).
 
 
 ## Class diagram
@@ -14,17 +15,15 @@ classDiagram
     direction LR
 
     class UserAccount {
-        email
+        username
+        displayName
         passwordHash
-        accountType: AccountType
+        role: Role
     }
-    class AccountType {
+    class Role {
         <<enumeration>>
         ADMIN
         TEACHER
-    }
-    class Teacher {
-        name
     }
     class Student {
         studentNumber
@@ -93,17 +92,42 @@ classDiagram
         BLENDED
     }
     class GroupingContext {
-        academicYear
-        groupSize
+        name
+        description
+        academicYear, optional
+        groupSize: 2..10
+        createdAt
+    }
+    class ContextCompetency {
+        importance: greater than 0, at most 1
     }
     class GroupSet {
-        createdOn
+        generatedAt
+        strategy
+        seed
+        groupSize
+        weakestScore
+        averageScore
+        spread
+        randomWeakestScore
+        warnings
     }
-    class Group {
+    class StudentGroup {
         number
+        score
+    }
+    class GroupMember {
+        overallScore
+        lowEvidence
+        strongestCompetency
+    }
+    class GroupStrength {
+        competency
+        importance
+        strength
+        carriedBy
     }
 
-    UserAccount "0..1" -- "0..1" Teacher : identifies
     Student "*" --> "1" Degree : enrolled in
     Degree "1..*" -- "*" CourseUnit : includes
     CourseUnit "1" -- "*" CourseUnitCompetency : develops
@@ -112,26 +136,31 @@ classDiagram
     AcademicRecord "*" --> "1" CourseUnit : for
     Student "1" -- "*" CompetencyAssessment : receives
     CompetencyAssessment "*" --> "1" Competency : about
-    CompetencyAssessment "*" --> "1" Teacher : assessed by
     Student "1" -- "1" StudentProfile : summarised by
     StudentProfile "1" *-- "*" CompetencyScore
     CompetencyScore "*" --> "1" Competency
     CompetencyScore "1" *-- "*" Evidence : explained by
     Evidence "*" ..> "0..1" AcademicRecord : from
     Evidence "*" ..> "0..1" CompetencyAssessment : from
-    Teacher "1" -- "*" GroupingContext : defines
-    GroupingContext "*" --> "1" CourseUnit : for
+    UserAccount "1" -- "*" GroupingContext : owns
+    GroupingContext "*" --> "0..1" CourseUnit : for
+    GroupingContext "*" -- "*" Student : eligible
+    GroupingContext "1" *-- "1..*" ContextCompetency : relevant
+    ContextCompetency "*" --> "1" Competency
     GroupingContext "1" -- "*" GroupSet : produces
-    GroupSet "1" *-- "1..*" Group
-    Group "*" -- "2..*" Student : members
+    UserAccount "1" -- "*" GroupSet : generated
+    GroupSet "1" *-- "1..*" StudentGroup
+    StudentGroup "1" *-- "2..*" GroupMember
+    GroupMember "*" --> "1" Student
+    StudentGroup "1" *-- "*" GroupStrength : explained by
 ```
 
 ## Concepts
 
 | Concept | Use-case term | Use cases | Description |
 |---|---|---|---|
-| **UserAccount** | Credenciais, Tipo de Conta | UC1, UC2 | Credentials used to log in. Its `AccountType` defines which features the user can access. Only Admins and Teachers have accounts; students are managed by them and do not log in. |
-| **Teacher** | Professor | UC7, UC8, UC10–UC14 | Academic staff member who registers academic results, assesses new students, defines grouping contexts and forms groups. |
+| **UserAccount** | Conta, Credenciais | UC1, UC2 | An account that can log in, with a unique username and a password stored only as a hash. Its `Role` defines which features the user can access. Only admins and teachers have accounts; students are managed by them and do not log in. |
+| **Role** | Tipo de Conta | UC1, UC2 | `TEACHER` (Professor): registers academic results, assesses new students, defines projects and forms groups. `ADMIN`: also manages accounts, degrees, course units and students. |
 | **Student** | Estudante | UC9, UC10, UC12, UC13, UC16 | A student of a degree, identified by a unique student number. Managed by the Admin (UC9). |
 | **Degree** | Curso | UC3, UC4, UC9 | A degree programme (e.g. "Engenharia Informática"). |
 | **CourseUnit** | Cadeira | UC5, UC6, UC10, UC11 | A course unit of one or more degrees, with its ECTS credits and position in the curriculum. |
@@ -142,9 +171,12 @@ classDiagram
 | **StudentProfile** *(derived)* | Perfil do Estudante | UC12, UC16 | The current summary of a student: one `CompetencyScore` per competency. It is calculated from academic records and assessments, never entered by hand, so it is always up to date. |
 | **CompetencyScore** *(derived)* | Pontuação de Competência | UC12, UC16 | The student's level in one competency (0 to 1), how much evidence supports it (`totalWeight`), how reliable it is (`confidence`) and which kinds of evidence it uses (`status`). With no evidence at all, the score is unknown rather than 0. A low confidence is what "perfil com pouca evidência" means in the search filters. |
 | **Evidence** *(derived)* | Evidência | UC12, UC13 | One piece of information about a competency: the best grade of a course unit, or a teacher assessment. It has a value (0 to 1), a weight and its share of the score, which is how the profile explains each number. |
-| **GroupingContext** | Contexto de Agrupamento | UC8, UC14 | The situation in which groups are formed: a course unit, an academic year and a target group size. |
-| **GroupSet** | Conjunto de Grupos | UC7, UC8 | One result of forming groups for a grouping context. It can be exported (UC7). |
-| **Group** | Grupo | UC7, UC8 | A numbered group of students within a group set. |
+| **GroupingContext** | Projeto (Contexto de Agrupamento) | UC8, UC14 | The situation in which groups are formed, shown to teachers as a "project": its eligible students, the group size chosen by the teacher and, optionally, a course unit and academic year. It belongs to the teacher who created it. |
+| **ContextCompetency** | Competência Relevante | UC14 | A competency that matters for a project, with its importance. Groups are balanced on these competencies only. |
+| **GroupSet** | Conjunto de Grupos | UC7, UC8 | One generation of groups for a project: when and by whom, with which strategy, seed and group size, and how good the result is (weakest and average group, compared with random groups). Every generation is kept. |
+| **StudentGroup** | Grupo | UC7, UC8 | A numbered group within a group set, with its score. |
+| **GroupMember** | Membro do Grupo | UC7, UC8 | A student in a group, with what was known about them when the groups were generated (overall score, strongest competency, whether they had no grades yet). |
+| **GroupStrength** | Força do Grupo | UC8 | How strong a group was in one relevant competency and which member carries it: the explanation of why the students were grouped together. |
 
 The search use case (UC16, "Pesquisar e Filtrar Estudantes") introduces no new concepts: it
 filters existing ones. "Cadeira em que está inscrito" means an `AcademicRecord` with
@@ -152,7 +184,7 @@ status `ENROLLED`, and "nível mínimo numa competência" uses `CompetencyScore`
 
 ## Relationships and constraints
 
-1. A student number and an email are unique (UC9). An account email is unique (UC1).
+1. A student number and an email are unique (UC9). An account username is unique (UC1).
 2. A degree code and name are unique (UC3). A course unit code is unique, and a course
    unit belongs to at least one degree (UC5).
 3. A student belongs to exactly one existing degree (UC9).
@@ -169,11 +201,15 @@ status `ENROLLED`, and "nível mínimo numa competência" uses `CompetencyScore`
    grade of each linked course unit and the teacher assessment. The more academic evidence
    exists, the less the initial assessment counts. Changing a course-unit weight changes the
    calculated profiles (UC11, UC12).
-9. A group size is at least 2 and at most the number of students in the grouping
-   context (UC8).
-10. Only students enrolled in the context's course unit can be placed in its groups, and
-    within a group set each student belongs to exactly one group (UC8).
-11. A group set can only be exported by the teacher who created it (UC7).
+9. A project's group size is between 2 and 10, and the importance of a relevant competency
+   is greater than 0 and at most 1. A student can only be chosen once (UC14).
+10. Within a group set each eligible student belongs to exactly one group. The number of
+    groups is ⌈students / group size⌉ and group sizes differ by at most one; nobody is alone
+    in a group. At least 2 eligible students are needed (UC8).
+11. A project and its group sets can only be seen, generated and exported by the teacher who
+    owns the project, or by an admin (UC7, UC8, UC14).
+12. A group set keeps a copy of its explanation, so it does not change when profiles or the
+    project change later. A student who is in a group set cannot be deleted (UC8, UC9).
 
 ## How the model supports the open problems
 
@@ -186,5 +222,6 @@ status `ENROLLED`, and "nível mínimo numa competência" uses `CompetencyScore`
   initial profile based on the teacher's observation. `CompetencyScore.confidence` shows
   how much each score can be trusted, and academic evidence gradually takes over as it
   becomes available. The exact formula is a Sprint 2 decision.
-- **Matching:** `GroupingContext`, `GroupSet` and `Group` give the future
-  group-formation algorithm a place to read its input and store its result.
+- **Matching:** `GroupingContext` and `ContextCompetency` are the input of the
+  group-formation algorithm; `GroupSet`, `StudentGroup`, `GroupMember` and `GroupStrength`
+  store its result and the explanation shown to the teacher.
