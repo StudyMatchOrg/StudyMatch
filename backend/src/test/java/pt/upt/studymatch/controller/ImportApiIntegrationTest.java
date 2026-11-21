@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import pt.upt.studymatch.domain.CourseUnit;
@@ -29,6 +30,8 @@ import pt.upt.studymatch.repository.StudentRepository;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+// Sprint 3: the API now requires a login. An admin can call every endpoint these tests use.
+@WithMockUser(roles = "ADMIN")
 class ImportApiIntegrationTest {
 
     private static final String URL = "/api/imports/academic-records";
