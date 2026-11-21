@@ -10,8 +10,8 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | Ator | Descrição |
 |---|---|
 | **Utilizador** | Qualquer pessoa com conta no sistema. Generaliza os restantes atores. |
-| **Admin** | Gere contas e a estrutura académica (cursos e cadeiras). |
-| **Professor** | Gere a informação académica dos estudantes, consulta perfis e forma grupos. |
+| **Admin** | Gere contas, a estrutura académica (cursos e cadeiras) e os estudantes. Pode também fazer tudo o que o Professor faz. |
+| **Professor** | Gere a informação académica dos estudantes, consulta perfis, define projetos e forma grupos. |
 
 ---
 
@@ -32,7 +32,7 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | 11 | Gerir Competências das Cadeiras | Professor |
 | 12 | Consultar Perfil do Estudante | Professor |
 | 13 | Registar Avaliação Inicial | Professor |
-| 14 | Definir Contexto de Agrupamento | Professor |
+| 14 | Definir Projeto (Contexto de Agrupamento) | Professor |
 | 15 | Importar Histórico Académico *(proposta da equipa)* | Professor |
 | 16 | Pesquisar e Filtrar Estudantes *(proposta da equipa)* | Utilizador |
 
@@ -45,8 +45,8 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | **Ator** | Admin |
 | **Descrição** | 1. O caso de uso inicia quando o Admin seleciona a opção *Registar Conta*.<br>2. O Sistema lê os tipos de conta.<br>3. O Sistema apresenta os tipos de conta.<br>4. O Admin seleciona o tipo de conta.<br>5. O Sistema pede as informações do Utilizador da nova conta.<br>6. O Admin insere as informações do Utilizador.<br>7. O Sistema regista o Utilizador. |
 | **Cenário Alternativo** | **As credenciais do novo utilizador já estão em uso:**<br>1. O sistema apresenta um aviso. |
-| **Regras de Negócio / Restrições** | • Só o Admin pode registar contas.<br>• O email (ou username) é único.<br>• Os campos obrigatórios têm de estar preenchidos.<br>• O tipo de conta tem de ser um dos existentes.<br>• A palavra-passe nunca é guardada em texto simples. |
-| **Conceitos do Domínio** | Tipo de Conta, Admin, Professor, Credenciais. |
+| **Regras de Negócio / Restrições** | • Só o Admin pode registar contas.<br>• O username é único e tem 3 a 30 caracteres (letras minúsculas, dígitos, ".", "_" ou "-").<br>• Os campos obrigatórios têm de estar preenchidos.<br>• O tipo de conta é ADMIN ou TEACHER (Professor).<br>• A palavra-passe tem pelo menos 8 caracteres e nunca é guardada em texto simples, apenas o seu hash (BCrypt). |
+| **Conceitos do Domínio** | Conta, Tipo de Conta, Admin, Professor, Credenciais. |
 
 ---
 
@@ -55,9 +55,9 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | Campo | Detalhes |
 | :--- | :--- |
 | **Ator** | Utilizador |
-| **Descrição** | 1. O caso de uso inicia quando o Utilizador seleciona a opção *Login*.<br>2. O Sistema pede as credenciais do Utilizador.<br>3. O Utilizador insere as credenciais.<br>4. O Sistema autentica o Utilizador. |
-| **Cenário Alternativo** | **O Utilizador não se encontra registado no Sistema ou a palavra-passe está errada:**<br>1. O sistema apresenta um aviso. |
-| **Regras de Negócio / Restrições** | • O acesso às funcionalidades depende do tipo de conta. |
+| **Descrição** | 1. O caso de uso inicia quando o Utilizador abre a aplicação sem sessão iniciada.<br>2. O Sistema pede as credenciais do Utilizador.<br>3. O Utilizador insere o username e a palavra-passe.<br>4. O Sistema autentica o Utilizador e mostra as funcionalidades do seu tipo de conta. |
+| **Cenário Alternativo** | **1. O Utilizador não se encontra registado no Sistema ou a palavra-passe está errada:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta o mesmo aviso nos dois casos ("username ou palavra-passe inválidos"), para não revelar que contas existem.<br>**2. A sessão expirou:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema volta a pedir as credenciais. |
+| **Regras de Negócio / Restrições** | • O acesso às funcionalidades depende do tipo de conta: o Admin pode fazer tudo o que o Professor faz.<br>• Sem sessão iniciada só é possível fazer login.<br>• A sessão dura 8 horas. |
 | **Conceitos do Domínio** | Credenciais, Tipo de Conta. |
 
 ---
@@ -115,9 +115,9 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | Campo | Detalhes |
 | :--- | :--- |
 | **Ator** | Professor |
-| **Descrição** | 1. O caso de uso inicia quando o Professor seleciona a opção *Exportar Grupos*.<br>2. O Sistema lê os conjuntos de grupos já realizados.<br>3. O Sistema apresenta os conjuntos.<br>4. O Professor seleciona o conjunto.<br>5. O sistema exporta o ficheiro. |
-| **Cenário Alternativo** | **Não existem conjuntos registados:**<br>1. O sistema apresenta um aviso. |
-| **Regras de Negócio / Restrições** | • Só o Professor pode exportar, e apenas os conjuntos que criou.<br>• O formato é fixo (por exemplo, CSV).<br>• O ficheiro inclui cadeira, nº do grupo e alunos. |
+| **Descrição** | 1. O caso de uso inicia quando o Professor abre um conjunto de grupos de um dos seus projetos (UC8).<br>2. O Professor seleciona *Export CSV*.<br>3. O Sistema gera e descarrega o ficheiro. |
+| **Cenário Alternativo** | **O conjunto não existe ou pertence a um projeto de outro professor:**<br>1. O sistema indica que o conjunto não existe. |
+| **Regras de Negócio / Restrições** | • Só o dono do projeto (ou um Admin) pode exportar os seus conjuntos.<br>• O ficheiro é CSV separado por ";" e em UTF-8, para abrir diretamente no Excel em português.<br>• Uma linha por estudante: projeto, data da geração, nº do grupo, nº de estudante, nome, email e competência mais forte.<br>• Valores que uma folha de cálculo executaria como fórmula (começados por =, +, - ou @) são escritos com um apóstrofo antes, para não serem executados. |
 | **Conceitos do Domínio** | Conjunto de Grupos, Grupo |
 
 ---
@@ -127,12 +127,12 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | Campo | Detalhes |
 | :--- | :--- |
 | **Ator** | Professor |
-| **Descrição** | 1. O caso de uso inicia quando o professor seleciona a opção *Formar Grupos*.<br>2. O sistema apresenta os contextos de agrupamento do professor (UC14).<br>3. O professor seleciona o contexto.<br>4. O sistema lê os perfis dos estudantes inscritos na cadeira do contexto.<br>5. O Sistema forma os grupos.<br>6. O Sistema apresenta os grupos.<br>7. O Sistema guarda os grupos como um conjunto. |
-| **Cenário Alternativo** | **1. Não existem alunos inscritos na cadeira:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso.<br>**2. As informações são inválidas:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso. |
-| **Regras de Negócio / Restrições** | • Só o Professor pode formar grupos.<br>• O tamanho do grupo tem de ser $\ge 2$ e $\le$ nº de alunos.<br>• Cada aluno fica em exatamente um grupo por conjunto.<br>• Só entram alunos inscritos na cadeira do contexto.<br>• Os grupos ficam guardados como um conjunto. |
-| **Conceitos do Domínio** | Contexto de Agrupamento, Grupo, Conjunto de Grupos, Perfil do Estudante |
+| **Descrição** | 1. O caso de uso inicia quando o Professor abre um dos seus projetos (UC14) e seleciona *Generate groups*.<br>2. O Professor escolhe a estratégia: equilibrada e complementar (por omissão) ou aleatória.<br>3. O Sistema calcula o perfil atual de cada estudante elegível (UC12).<br>4. O Sistema decide quantos grupos formar e de que tamanho.<br>5. O Sistema forma os grupos.<br>6. O Sistema guarda os grupos como um novo conjunto, com a data e hora da geração.<br>7. O Sistema apresenta os grupos e explica cada um: membros, força do grupo em cada competência relevante e quem a assegura, pontos fortes e lacunas, e a comparação com grupos aleatórios. |
+| **Cenário Alternativo** | **1. O projeto tem menos de 2 estudantes elegíveis:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema não forma grupos e apresenta um aviso.<br>**2. Os estudantes não se dividem no tamanho escolhido (ex.: 11 estudantes em grupos de 5):**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema forma os grupos mais próximos possível (4 + 4 + 3) e guarda e mostra um aviso.<br>**3. Há estudantes sem notas (cold start):**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema usa a estimativa do professor e a média da turma, e assinala esses estudantes. |
+| **Regras de Negócio / Restrições** | • Todos os estudantes elegíveis são considerados, e cada um fica em exatamente um grupo de cada conjunto.<br>• O mesmo estudante não pode ser escolhido duas vezes.<br>• Número de grupos = ⌈estudantes / tamanho⌉; os tamanhos diferem no máximo em 1. Com tamanho 5, os grupos têm 4 ou 5 estudantes sempre que possível (23 estudantes: 5 + 5 + 5 + 4 + 4).<br>• Nenhum estudante fica sozinho num grupo.<br>• Todas as gerações ficam guardadas e podem ser consultadas mais tarde, mesmo depois de mudarem os perfis ou o projeto.<br>• A mesma informação e a mesma semente dão os mesmos grupos. |
+| **Conceitos do Domínio** | Projeto (Contexto de Agrupamento), Conjunto de Grupos, Grupo, Perfil do Estudante |
 
-> **Nota:** O critério de formação usará os perfis dos estudantes (UC12) e será definido num sprint futuro.
+> **Nota:** A estratégia está explicada e justificada em [sprint-3-design.md](sprint-3-design.md).
 
 ---
 
@@ -142,9 +142,9 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | :--- | :--- |
 | **Objetivo** | Manter a informação que identifica cada estudante e o seu contexto académico. |
 | **Ator** | Admin |
-| **Descrição** | 1. O caso de uso inicia quando o Admin seleciona a opção *Estudantes*.<br>2. O Sistema apresenta a lista de estudantes.<br>3. O Admin escolhe criar um estudante ou editar um existente.<br>4. O Sistema pede os dados do estudante (número, nome, email, curso, ano de entrada).<br>5. O Admin insere ou altera os dados.<br>6. O Sistema valida e guarda o estudante. |
-| **Cenário Alternativo** | **1. O número de estudante ou o email já existem:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso e não guarda.<br>**2. Faltam campos obrigatórios ou o email é inválido:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema indica os campos com erro. |
-| **Regras de Negócio / Restrições** | • O número de estudante e o email são únicos.<br>• Cada estudante pertence a um curso existente.<br>• O ano de entrada não pode ser posterior ao ano atual.<br>• Os dados ficam guardados entre execuções. |
+| **Descrição** | 1. O caso de uso inicia quando o Admin seleciona a opção *Estudantes*.<br>2. O Sistema apresenta a lista de estudantes.<br>3. O Admin escolhe criar um estudante, editar um existente ou apagá-lo.<br>4. O Sistema pede os dados do estudante (número, nome, email, curso, ano de entrada).<br>5. O Admin insere ou altera os dados.<br>6. O Sistema valida e guarda o estudante. |
+| **Cenário Alternativo** | **1. O número de estudante ou o email já existem:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso e não guarda.<br>**2. Faltam campos obrigatórios ou o email é inválido:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema indica os campos com erro.<br>**3. O Admin tenta apagar um estudante que está em grupos guardados:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema recusa, para que os grupos anteriores continuem completos. |
+| **Regras de Negócio / Restrições** | • O número de estudante e o email são únicos.<br>• Cada estudante pertence a um curso existente.<br>• O ano de entrada não pode ser posterior ao ano atual.<br>• Os dados ficam guardados entre execuções.<br>• Apagar um estudante apaga também o seu histórico académico, as avaliações iniciais e a sua participação em projetos. |
 | **Conceitos do Domínio** | Estudante, Curso |
 
 ---
@@ -171,7 +171,7 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 | **Regras de Negócio / Restrições** | • As competências são configuráveis, não fixas no código.<br>• Uma cadeira pode desenvolver várias competências, e uma competência pode vir de várias cadeiras.<br>• Alterar os pesos atualiza os perfis calculados. |
 | **Conceitos do Domínio** | Competência, Cadeira, Peso da Competência |
 
-> **Nota:** No Sprint 2 as competências e os pesos são carregados como dados e consultados no ecrã *Competencies*; a edição fica para um sprint futuro.
+> **Nota:** Desde o Sprint 3 as competências e os pesos são editados no ecrã *Competencies*: criar e renomear competências, associar uma cadeira com um peso, mudar o peso e remover a associação. O código da competência não muda.
 
 ---
 
@@ -202,18 +202,16 @@ perfil do estudante, cold start e contexto de agrupamento) e incluem propostas d
 
 ---
 
-## 14. Definir Contexto de Agrupamento
+## 14. Definir Projeto (Contexto de Agrupamento)
 
 | Campo | Detalhes |
 | :--- | :--- |
-| **Objetivo** | Definir a situação em que os grupos vão ser formados. |
+| **Objetivo** | Definir a situação em que os grupos vão ser formados: um projeto de uma cadeira, um trabalho, uma aula prática... |
 | **Ator** | Professor |
-| **Descrição** | 1. O caso de uso inicia quando o Professor seleciona *Novo Contexto de Agrupamento*.<br>2. O Sistema pede a cadeira, o ano letivo e o tamanho dos grupos.<br>3. O Professor insere os dados.<br>4. O Sistema mostra quantos estudantes estão inscritos e quantos grupos resultam.<br>5. O Professor confirma e o Sistema guarda o contexto. |
-| **Cenário Alternativo** | **O tamanho do grupo é inválido para o número de inscritos:**<br>1. O sistema apresenta um aviso. |
-| **Regras de Negócio / Restrições** | • O tamanho do grupo tem de ser ≥ 2 e ≤ nº de inscritos.<br>• Um contexto pertence a uma cadeira e a um ano letivo.<br>• Um contexto pode originar vários conjuntos de grupos (UC8). |
-| **Conceitos do Domínio** | Contexto de Agrupamento, Cadeira |
-
-> **Nota:** A formação automática de grupos está fora do âmbito do Sprint 2.
+| **Descrição** | 1. O caso de uso inicia quando o Professor seleciona *New project*.<br>2. O Sistema pede o nome, uma descrição, a cadeira e o ano letivo (opcionais), o tamanho dos grupos, os estudantes e as competências relevantes.<br>3. O Professor pode carregar os estudantes inscritos na cadeira nesse ano letivo, e acrescentar ou retirar estudantes.<br>4. O Professor indica a importância de cada competência relevante (de 0.1 a 1).<br>5. O Sistema guarda o projeto e mostra quantos estudantes tem e os grupos que vão resultar (ex.: 5 + 5 + 5 + 4 + 4). |
+| **Cenário Alternativo** | **1. O tamanho do grupo está fora de 2 a 10, falta o nome ou nenhuma competência é relevante:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso e não guarda.<br>**2. Um estudante foi escolhido duas vezes:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema apresenta um aviso e não guarda.<br>**3. Os estudantes não se dividem no tamanho escolhido:**<br>&nbsp;&nbsp;&nbsp;&nbsp;1. O sistema guarda e avisa que alguns grupos vão ter tamanhos diferentes. |
+| **Regras de Negócio / Restrições** | • O tamanho dos grupos é escolhido pelo Professor para cada projeto, entre 2 e 10 (5 por omissão).<br>• Um projeto pertence ao Professor que o criou: os outros professores não o veem (um Admin vê todos).<br>• A importância de cada competência é maior que 0 e no máximo 1.<br>• Um projeto pode originar vários conjuntos de grupos (UC8); mudar o projeto não altera os conjuntos já gerados. |
+| **Conceitos do Domínio** | Projeto (Contexto de Agrupamento), Competência Relevante, Estudante, Cadeira |
 
 ---
 
@@ -244,7 +242,7 @@ linhas com problemas, o que melhora a qualidade dos dados.
 | **Ator** | Utilizador |
 | **Descrição** | 1. O caso de uso inicia quando o Utilizador abre a lista de estudantes.<br>2. O Sistema apresenta os campos de pesquisa e os filtros.<br>3. O Utilizador escreve um nome ou número, e/ou escolhe filtros: curso, ano de entrada, cadeira em que está inscrito, nível mínimo numa competência, ou "perfil com pouca evidência".<br>4. O Sistema apresenta os estudantes que cumprem todos os critérios, com o número de resultados.<br>5. O Utilizador pode ordenar os resultados (por nome, número ou nível numa competência). |
 | **Cenário Alternativo** | **Nenhum estudante cumpre os critérios:**<br>1. O sistema indica que não há resultados e sugere remover filtros. |
-| **Regras de Negócio / Restrições** | • A pesquisa por nome ignora maiúsculas e acentos ("joao" encontra "João").<br>• Os filtros combinam-se (todos têm de ser cumpridos).<br>• A operação é só de leitura. |
+| **Regras de Negócio / Restrições** | • A pesquisa por nome ignora maiúsculas e acentos ("joao" encontra "João").<br>• Os filtros combinam-se (todos têm de ser cumpridos).<br>• "Perfil com pouca evidência" significa um estudante ainda sem notas (só estimativas do professor ou nada).<br>• O nível mínimo e a ordenação por nível exigem uma competência escolhida.<br>• A operação é só de leitura. |
 | **Conceitos do Domínio** | Estudante, Curso, Cadeira, Perfil do Estudante, Pontuação de Competência |
 
 **Porque acrescenta valor:** com dezenas ou centenas de estudantes, uma lista simples deixa
