@@ -11,6 +11,8 @@ public interface CourseUnitRepository extends JpaRepository<CourseUnit, Long> {
 
     Optional<CourseUnit> findByCode(String code);
 
+    boolean existsByCode(String code);
+
     @Query("select cu from CourseUnit cu order by cu.curricularYear, cu.semester, cu.code")
     List<CourseUnit> findAllInCurricularOrder();
 
