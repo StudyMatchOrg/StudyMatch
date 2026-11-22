@@ -1,9 +1,17 @@
 package pt.upt.studymatch.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.upt.studymatch.domain.AcademicRecord;
+import pt.upt.studymatch.domain.Competency;
+import pt.upt.studymatch.domain.CompetencyAssessment;
+import pt.upt.studymatch.domain.CourseUnitCompetency;
 import pt.upt.studymatch.domain.ProfileCalculator;
+import pt.upt.studymatch.domain.ProfiledStudent;
 import pt.upt.studymatch.domain.Student;
 import pt.upt.studymatch.domain.StudentProfile;
 import pt.upt.studymatch.dto.ProfileResponse;
@@ -45,5 +53,28 @@ public class ProfileService {
                 linkRepository.findAllInCurricularOrder(),
                 assessmentRepository.findByStudent(studentId));
         return ProfileResponse.from(student, profile, LocalDateTime.now());
+    }
+
+    /**
+     * The profiles of many students at once, in the given order. Loads all the evidence in four
+     * queries instead of four per student, for search filters and group formation.
+     */
+    @Transactional(readOnly = true)
+    public List<ProfiledStudent> profilesOf(List<Student> students) {
+        if (students.isEmpty()) {
+            return List.of();
+        }
+        List<Long> ids = students.stream().map(Student::getId).toList();
+        List<Competency> competencies = competencyRepository.findAll();
+        List<CourseUnitCompetency> links = linkRepository.findAllInCurricularOrder();
+        Map<Long, List<AcademicRecord>> records = recordRepository.findByStudentsInOrder(ids).stream()
+                .collect(Collectors.groupingBy(r -> r.getStudent().getId()));
+        Map<Long, List<CompetencyAssessment>> assessments = assessmentRepository.findByStudents(ids).stream()
+                .collect(Collectors.groupingBy(a -> a.getStudent().getId()));
+        return students.stream()
+                .map(student -> new ProfiledStudent(student, calculator.calculate(competencies,
+                        records.getOrDefault(student.getId(), List.of()), links,
+                        assessments.getOrDefault(student.getId(), List.of()))))
+                .toList();
     }
 }
