@@ -86,7 +86,8 @@ public class AcademicRecord {
         this.grade = grade;
     }
 
-    private static void validateAcademicYear(String academicYear) {
+    // Also used by GroupingContext, so a project's academic year follows the same rule.
+    static void validateAcademicYear(String academicYear) {
         Matcher matcher = academicYear == null ? null : ACADEMIC_YEAR.matcher(academicYear);
         if (matcher == null || !matcher.matches()
                 || Integer.parseInt(matcher.group(2)) != Integer.parseInt(matcher.group(1)) + 1) {
