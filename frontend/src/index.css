@@ -204,6 +204,11 @@ section {
   color: var(--ok);
 }
 
+.alert-warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
 /* Tables */
 
 .table-wrap {
@@ -257,12 +262,14 @@ label {
 
 input,
 select,
+textarea,
 button {
   font: inherit;
 }
 
 input,
-select {
+select,
+textarea {
   padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -429,4 +436,139 @@ button:disabled {
   border-radius: 999px;
   margin-right: 4px;
   vertical-align: middle;
+}
+
+/*
+ * Sprint 3 (#74): every class used by the new screens is defined here up front, as in #48,
+ * so the features of Sprint 3 do not need to edit this shared file.
+ */
+
+/* Login and user menu */
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.login-card {
+  width: min(380px, 100%);
+  margin: 0;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+/* Filters and checkbox lists */
+
+.filters {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  align-items: end;
+}
+
+label.inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.importance-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) 90px;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Summary tiles */
+
+.stat-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.stat {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Generated groups */
+
+.group-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.group-grid > section {
+  margin-bottom: 0;
+}
+
+.group-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.member-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.member-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.strength-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) 1.2fr 3em;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
