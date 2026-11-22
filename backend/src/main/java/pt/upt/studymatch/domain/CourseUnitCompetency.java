@@ -42,11 +42,16 @@ public class CourseUnitCompetency {
     }
 
     public CourseUnitCompetency(CourseUnit courseUnit, Competency competency, double weight) {
+        this.courseUnit = courseUnit;
+        this.competency = competency;
+        changeWeight(weight);
+    }
+
+    /** Profiles use the new weight immediately, since they are calculated on request. */
+    public void changeWeight(double weight) {
         if (weight <= 0 || weight > MAX_WEIGHT) {
             throw new BusinessRuleException("Competency weight must be greater than 0 and at most 1, but was " + weight);
         }
-        this.courseUnit = courseUnit;
-        this.competency = competency;
         this.weight = weight;
     }
 
