@@ -1,11 +1,12 @@
 package pt.upt.studymatch.domain;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.Set;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
 import pt.upt.studymatch.exception.BusinessRuleException;
 
 class CourseUnitCompetencyTest {
@@ -26,5 +27,15 @@ class CourseUnitCompetencyTest {
         assertThatThrownBy(() -> new CourseUnitCompetency(POO, PROGRAMMING, weight))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("greater than 0 and at most 1");
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {0.0, 1.01})
+    void aChangedWeightFollowsTheSameRule(double weight) {
+        CourseUnitCompetency link = new CourseUnitCompetency(POO, PROGRAMMING, 0.5);
+
+        assertThatThrownBy(() -> link.changeWeight(weight)).isInstanceOf(BusinessRuleException.class);
+        link.changeWeight(1.0);
+        assertThat(link.getWeight()).isEqualTo(1.0);
     }
 }

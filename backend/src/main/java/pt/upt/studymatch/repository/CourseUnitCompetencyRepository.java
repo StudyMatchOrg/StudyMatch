@@ -1,12 +1,16 @@
 package pt.upt.studymatch.repository;
 
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import pt.upt.studymatch.domain.CourseUnitCompetency;
 
 public interface CourseUnitCompetencyRepository extends JpaRepository<CourseUnitCompetency, Long> {
+
+    boolean existsByCourseUnitIdAndCompetencyId(Long courseUnitId, Long competencyId);
 
     @Query("""
             select link from CourseUnitCompetency link
