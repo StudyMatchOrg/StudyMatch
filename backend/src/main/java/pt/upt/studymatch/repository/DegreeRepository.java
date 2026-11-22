@@ -10,4 +10,6 @@ public interface DegreeRepository extends JpaRepository<Degree, Long> {
     List<Degree> findAllByOrderByCodeAsc();
 
     Optional<Degree> findByCode(String code);
+
+    boolean existsByCode(String code);
 }
