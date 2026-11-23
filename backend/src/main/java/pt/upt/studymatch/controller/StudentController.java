@@ -9,10 +9,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pt.upt.studymatch.dto.StudentRequest;
 import pt.upt.studymatch.dto.StudentResponse;
+import pt.upt.studymatch.dto.StudentSearchFilter;
+import pt.upt.studymatch.dto.StudentSearchResponse;
+import pt.upt.studymatch.service.StudentSearchService;
 import pt.upt.studymatch.service.StudentService;
 
 @RestController
@@ -20,14 +24,22 @@ import pt.upt.studymatch.service.StudentService;
 public class StudentController {
 
     private final StudentService studentService;
+    private final StudentSearchService searchService;
 
-    public StudentController(StudentService studentService) {
+    public StudentController(StudentService studentService, StudentSearchService searchService) {
         this.studentService = studentService;
+        this.searchService = searchService;
     }
 
+    // Without parameters, lists every student by number (as in Sprint 2).
     @GetMapping
-    public List<StudentResponse> findAll() {
-        return studentService.findAll();
+    public List<StudentSearchResponse> search(@RequestParam(required = false) String q,
+            @RequestParam(required = false) Long degreeId, @RequestParam(required = false) Integer enrolmentYear,
+            @RequestParam(required = false) Long courseUnitId, @RequestParam(required = false) String competency,
+            @RequestParam(required = false) Double minScore, @RequestParam(required = false) Boolean lowEvidence,
+            @RequestParam(required = false) String sort) {
+        return searchService.search(new StudentSearchFilter(q, degreeId, enrolmentYear, courseUnitId, competency,
+                minScore, lowEvidence, sort));
     }
 
     @GetMapping("/{id}")

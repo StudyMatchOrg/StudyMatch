@@ -1,8 +1,6 @@
 package pt.upt.studymatch.service;
 
 import java.time.Year;
-import java.util.List;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.upt.studymatch.domain.Degree;
@@ -24,13 +22,6 @@ public class StudentService {
     public StudentService(StudentRepository studentRepository, DegreeRepository degreeRepository) {
         this.studentRepository = studentRepository;
         this.degreeRepository = degreeRepository;
-    }
-
-    @Transactional(readOnly = true)
-    public List<StudentResponse> findAll() {
-        return studentRepository.findAll(Sort.by("studentNumber")).stream()
-                .map(StudentResponse::from)
-                .toList();
     }
 
     @Transactional(readOnly = true)

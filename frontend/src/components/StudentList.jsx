@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 
-export default function StudentList({ students }) {
+// competencyName: when the search filtered or sorted by a competency, its score is shown too.
+export default function StudentList({ students, competencyName }) {
   if (students.length === 0) {
-    return <p className="muted">No students registered yet.</p>
+    return <p className="muted">No students match. Try removing some filters.</p>
   }
   return (
     <div className="table-wrap">
@@ -14,6 +15,7 @@ export default function StudentList({ students }) {
             <th>Degree</th>
             <th className="number">Enrolled</th>
             <th>Email</th>
+            {competencyName && <th className="number">{competencyName}</th>}
           </tr>
         </thead>
         <tbody>
@@ -21,11 +23,17 @@ export default function StudentList({ students }) {
             <tr key={student.id}>
               <td>{student.studentNumber}</td>
               <td>
-                <Link to={`/students/${student.id}`}>{student.name}</Link>
+                <Link to={`/students/${student.id}`}>{student.name}</Link>{' '}
+                {student.lowEvidence && <span className="badge badge-warn">no grades yet</span>}
               </td>
               <td>{student.degree.code}</td>
               <td className="number">{student.enrolmentYear}</td>
               <td>{student.email}</td>
+              {competencyName && (
+                <td className="number">
+                  {student.competencyScore == null ? <span className="muted">?</span> : student.competencyScore.toFixed(2)}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
