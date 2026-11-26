@@ -16,6 +16,8 @@ public interface GroupingContextRepository extends JpaRepository<GroupingContext
 
     Optional<GroupingContext> findFirstByName(String name);
 
+    List<GroupingContext> findByStudentsId(Long studentId);
+
     /** Students currently enrolled in a course unit in an academic year: the usual candidates for a project. */
     @Query("""
             select s from Student s

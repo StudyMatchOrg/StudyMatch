@@ -24,4 +24,6 @@ public interface CompetencyAssessmentRepository extends JpaRepository<Competency
     List<CompetencyAssessment> findByStudents(@Param("studentIds") Collection<Long> studentIds);
 
     boolean existsByStudentId(Long studentId);
+
+    void deleteByStudentId(Long studentId);
 }

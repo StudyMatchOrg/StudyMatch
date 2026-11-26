@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import StudentForm from '../components/StudentForm.jsx'
-import { getStudent, updateStudent } from '../services/studentsApi.js'
+import { deleteStudent, getStudent, updateStudent } from '../services/studentsApi.js'
 
 export default function EditStudentPage() {
   const studentId = Number(useParams().id)
@@ -28,6 +28,19 @@ export default function EditStudentPage() {
     navigate(`/students/${studentId}`)
   }
 
+  async function handleDelete() {
+    if (!window.confirm(`Delete ${student.name}? Their grades and assessments are deleted too. This cannot be undone.`)) {
+      return
+    }
+    setError(null)
+    try {
+      await deleteStudent(studentId)
+      navigate('/students')
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   return (
     <>
       <p>
@@ -38,6 +51,19 @@ export default function EditStudentPage() {
         {error && <p className="alert alert-error">{error}</p>}
         {student && <StudentForm initialStudent={student} submitLabel="Save changes" onSubmit={handleSave} />}
       </section>
+
+      {student && (
+        <section>
+          <h2>Delete student</h2>
+          <p className="muted small">
+            Removes the student with their academic history and initial assessments. Students who are in saved groups
+            cannot be deleted, so that earlier groups stay complete.
+          </p>
+          <button type="button" className="btn-danger" onClick={handleDelete}>
+            Delete student
+          </button>
+        </section>
+      )}
     </>
   )
 }
