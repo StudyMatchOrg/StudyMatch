@@ -1,4 +1,4 @@
-import { get, post } from './http.js'
+import { download, get, post } from './http.js'
 
 export function getStrategies() {
   return get('/api/grouping-strategies')
@@ -16,4 +16,9 @@ export function getGroupSets(projectId) {
 
 export function getGroupSet(id) {
   return get(`/api/group-sets/${id}`)
+}
+
+// Saves the groups as a CSV file (opens in Excel).
+export function exportGroupSet(id) {
+  return download(`/api/group-sets/${id}/export`)
 }

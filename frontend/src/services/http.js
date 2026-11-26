@@ -38,3 +38,22 @@ export const put = (path, data) => request(path, { method: 'PUT', body: JSON.str
 export const del = (path) => request(path, { method: 'DELETE' })
 
 export const upload = (path, formData) => request(path, { method: 'POST', body: formData })
+
+// Downloads a file (e.g. a CSV export) with the login token and saves it with the name sent by
+// the backend. A plain link cannot be used, because it would not send the token.
+export async function download(path) {
+  const token = getSession()?.token
+  const response = await fetch(path, { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.message ?? `Download failed with status ${response.status}`)
+  }
+  const disposition = response.headers.get('Content-Disposition') ?? ''
+  const fileName = /filename="?([^";]+)"?/.exec(disposition)?.[1] ?? 'download'
+  const url = URL.createObjectURL(await response.blob())
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
