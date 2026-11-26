@@ -1,7 +1,11 @@
 import { get, post, put } from './http.js'
 
-export function getStudents() {
-  return get('/api/students')
+// Without filters, every student. Filters: q, degreeId, enrolmentYear, courseUnitId,
+// competency, minScore, lowEvidence and sort (number, name or score). Empty ones are left out.
+export function getStudents(filters = {}) {
+  const query = new URLSearchParams(Object.entries(filters).filter(([, value]) => value !== '' && value != null))
+  const text = query.toString()
+  return get(text ? `/api/students?${text}` : '/api/students')
 }
 
 export function getStudent(id) {
