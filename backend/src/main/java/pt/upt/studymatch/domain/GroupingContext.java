@@ -110,6 +110,11 @@ public class GroupingContext {
         students.addAll(eligible);
     }
 
+    /** Used when a student is deleted. Saved groups keep their own copy of who was in them. */
+    public void removeStudent(Student student) {
+        students.removeIf(s -> s.getId().equals(student.getId()));
+    }
+
     /** The competencies that matter for this project and their importance. At least one is needed. */
     public void replaceCompetencies(Map<Competency, Double> importance) {
         if (importance.isEmpty()) {

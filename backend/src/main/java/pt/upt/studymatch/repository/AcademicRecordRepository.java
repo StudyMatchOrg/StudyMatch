@@ -37,4 +37,6 @@ public interface AcademicRecordRepository extends JpaRepository<AcademicRecord, 
             Long studentId, Long courseUnitId, String academicYear, int semester, Long id);
 
     boolean existsByStudentId(Long studentId);
+
+    void deleteByStudentId(Long studentId);
 }

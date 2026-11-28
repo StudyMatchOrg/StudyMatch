@@ -3,6 +3,7 @@ package pt.upt.studymatch.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import pt.upt.studymatch.dto.StudentRequest;
 import pt.upt.studymatch.dto.StudentResponse;
 import pt.upt.studymatch.dto.StudentSearchFilter;
 import pt.upt.studymatch.dto.StudentSearchResponse;
+import pt.upt.studymatch.service.StudentDeletionService;
 import pt.upt.studymatch.service.StudentSearchService;
 import pt.upt.studymatch.service.StudentService;
 
@@ -25,10 +27,13 @@ public class StudentController {
 
     private final StudentService studentService;
     private final StudentSearchService searchService;
+    private final StudentDeletionService deletionService;
 
-    public StudentController(StudentService studentService, StudentSearchService searchService) {
+    public StudentController(StudentService studentService, StudentSearchService searchService,
+            StudentDeletionService deletionService) {
         this.studentService = studentService;
         this.searchService = searchService;
+        this.deletionService = deletionService;
     }
 
     // Without parameters, lists every student by number (as in Sprint 2).
@@ -56,5 +61,12 @@ public class StudentController {
     @PutMapping("/{id}")
     public StudentResponse update(@PathVariable Long id, @Valid @RequestBody StudentRequest request) {
         return studentService.update(id, request);
+    }
+
+    // Admin only (see SecurityConfig)
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        deletionService.delete(id);
     }
 }

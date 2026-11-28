@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../auth/useAuth.js'
 import { getStudent } from '../../services/studentsApi.js'
 
 export default function StudentHeader({ studentId }) {
+  const { isAdmin } = useAuth()
   const [student, setStudent] = useState(null)
   const [error, setError] = useState(null)
 
@@ -26,9 +28,11 @@ export default function StudentHeader({ studentId }) {
           {student.studentNumber} · {student.degree.name} · enrolled in {student.enrolmentYear} · {student.email}
         </p>
       </div>
-      <Link className="btn btn-secondary" to={`/students/${student.id}/edit`}>
-        Edit student
-      </Link>
+      {isAdmin && (
+        <Link className="btn btn-secondary" to={`/students/${student.id}/edit`}>
+          Edit student
+        </Link>
+      )}
     </div>
   )
 }
